@@ -48,10 +48,12 @@ public class FoundationTree : MonoBehaviour
         AddNode("a_4", "OfflineMax", "Infinite Loop", "100% Offline Eff.", 1500, "a_3");
         AddNode("a_5", "UpgradeCostReduction", "Deep Learning", "-10% cost per 'A' node.", 4000, "a_4");
 
-        // --- SYNERGY & APEX ---
+        // --- SYNERGY  ---
         AddNode("syn_1", "SpeedBurst", "Chronos Pulse", "Rare signal speed burst.", 1200, "s_3,l_3");
         AddNode("syn_2", "AutoSeekerDataSpeed", "Economic AI", "Speed scales with Data.", 1500, "y_3,a_3");
         AddNode("syn_3", "RareSignalsGrantPP", "Void Siphon", "Rare signals grant PP.", 5000, "l_4,a_4");
+
+        // --- THE APEX GATEWAY ---
         AddNode("apex", "CanAccessPlanets", "Apex Gateway", "Unlock Planetary Access.", 10000, "syn_3");
         AddNode("auto", "SignalMatchingAutomation", "Signal Automation", "Auto Signal Matching.", 15000, "apex");
     }
