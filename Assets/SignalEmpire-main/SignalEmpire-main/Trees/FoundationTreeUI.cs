@@ -9,8 +9,8 @@ public class FoundationTreeUI : MonoBehaviour
 
     [SerializeField] private FoundationTree treeLogic; // Link to your FoundationTree script
 
-    private List<TechNodeData> allNodes = new List<TechNodeData>();
-    private Dictionary<char, List<TechNodeData>> nodesByBranch = new Dictionary<char, List<TechNodeData>>();
+    private List<TechNode> allNodes = new List<TechNode>();
+    private Dictionary<char, List<TechNode>> nodesByBranch = new Dictionary<char, List<TechNode>>();
 
     void Awake()
     {
@@ -34,10 +34,10 @@ public class FoundationTreeUI : MonoBehaviour
         // y=yield, s=speed, l=luck, a=auto
         foreach (char branch in new[] { 'y', 's', 'l', 'a' }) 
         {
-            nodesByBranch[branch] = new List<TechNodeData>();
+            nodesByBranch[branch] = new List<TechNode>();
         }
 
-        foreach (TechNodeData node in allNodes)
+        foreach (TechNode node in allNodes)
         {
             if (node.id.Length > 0)
             {
@@ -50,16 +50,16 @@ public class FoundationTreeUI : MonoBehaviour
         Debug.Log($"<color=yellow>Foundation Tree UI Initialized:</color> {allNodes.Count} nodes organized.");
     }
 
-    public List<TechNodeData> GetNodesByBranch(char branchLetter)
+    public List<TechNode> GetNodesByBranch(char branchLetter)
     {
         if (nodesByBranch.ContainsKey(branchLetter))
             return nodesByBranch[branchLetter];
-        return new List<TechNodeData>();
+        return new List<TechNode>();
     }
 
-    public List<TechNodeData> GetSynergyNodes()
+    public List<TechNode> GetSynergyNodes()
     {
-        List<TechNodeData> result = new List<TechNodeData>();
+        List<TechNode> result = new List<TechNode>();
         foreach (var node in allNodes)
         {
             if (node.id.StartsWith("syn") || node.id == "apex" || node.id == "auto")
@@ -73,7 +73,7 @@ public class FoundationTreeUI : MonoBehaviour
     /// </summary>
     public bool TryPurchaseNode(string nodeID)
     {
-        TechNodeData node = allNodes.Find(n => n.id == nodeID);
+        TechNode node = allNodes.Find(n => n.id == nodeID);
         if (node == null) return false;
 
         if (node.isPurchased)
@@ -100,7 +100,7 @@ public class FoundationTreeUI : MonoBehaviour
         node.isPurchased = true;
         
         // Notify the Tree to mark this as purchased for future prerequisites
-        treeLogic.MarkAsPurchased(node.caseName);
+        treeLogic.MarkAsPurchased(node.nodeName);
         
         Debug.Log($"<color=lime>Purchased:</color> {node.title}");
         return true;
@@ -108,7 +108,7 @@ public class FoundationTreeUI : MonoBehaviour
 
     public string GetNodeDisplayInfo(string nodeID)
     {
-        TechNodeData node = allNodes.Find(n => n.id == nodeID);
+        TechNode node = allNodes.Find(n => n.id == nodeID);
         if (node == null) return "Unknown Node";
 
         string info = $"<b>{node.title}</b>\n";
@@ -134,6 +134,14 @@ public class FoundationTreeUI : MonoBehaviour
         {
             string status = node.isPurchased ? "[✓]" : "[✗]";
             Debug.Log($"{status} {node.title} ({node.id})");
+        }
+    }
+
+    public void DebugPrintAllBranches()
+    {
+        foreach (char branch in new[] { 'y', 's', 'l', 'a' })
+        {
+            DebugPrintBranch(branch);
         }
     }
 }

@@ -56,6 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "My project (2).sln",
+    "dotnet.defaultSolution": "SignlEmpireCode.sln",
     "git.ignoreLimitWarning": true
 }

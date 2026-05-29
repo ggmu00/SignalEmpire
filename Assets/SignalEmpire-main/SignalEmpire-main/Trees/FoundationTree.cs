@@ -2,18 +2,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-[System.Serializable]
-public class TechNodeData
-{
-    public string id;
-    public string caseName; // Matches the switch case in FoundationNode
-    public string title;
-    public string description;
-    public double cost;
-    public string prerequisiteIds;
-    public bool isPurchased = false;
-}
-
 public class FoundationTree : MonoBehaviour
 {
     private SignalEngine engine => SignalEngine.instance;
@@ -70,13 +58,15 @@ public class FoundationTree : MonoBehaviour
 
     private void AddNode(string id, string caseName, string title, string desc, double cost, string preReqs)
     {
-        nodes.Add(new TechNodeData { 
-            id = id, 
-            caseName = caseName, 
-            title = title, 
-            description = desc, 
-            cost = cost, 
-            prerequisiteIds = preReqs 
+        nodes.Add(new TechNode
+        {
+            id = id,
+            nodeName = caseName,
+            title = title,
+            description = desc,
+            cost = cost,
+            prerequisiteIds = preReqs,
+            isPurchased = false
         });
     }
 
@@ -92,6 +82,12 @@ public class FoundationTree : MonoBehaviour
             node.isPurchased = true;
             ApplyNodeEffect(node.id); 
         }
+    }
+
+    public bool IsNodePurchased(string id)
+    {
+        TechNode node = nodes.Find(n => n.id == id);
+        return node != null && node.isPurchased;
     }
 
     public bool ArePrerequisitesMet(string id)

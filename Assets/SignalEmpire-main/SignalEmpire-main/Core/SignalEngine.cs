@@ -42,6 +42,7 @@ public class SignalEngine : MonoBehaviour
     public float travelTimeReduction = 0f;
     public float amplifierBoost = 1.0f;
     public float mineralYieldMult = 1.0f;
+    public float signalRangeMult = 1.0f;
     float actualMaxHeat = 0f;
     public bool stableAmpsEnabled = false;
     public bool canRunAtFullHeat = false;
