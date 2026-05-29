@@ -67,7 +67,7 @@ public class FoundationNode : MonoBehaviour
         {
             nodeButton.interactable = false;
             if (statusText != null) 
-                statusText.text = $"{givenName}\n<color=lime>ACTIVE</color>";
+                statusText.text = $"{givenName}\n<color=green>ACTIVE</color>";
         }
     }
 
