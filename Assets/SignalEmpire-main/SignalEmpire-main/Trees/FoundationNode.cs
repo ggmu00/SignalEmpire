@@ -8,7 +8,7 @@ public class FoundationNode : MonoBehaviour
 
     [Header("Node Settings")]
     public string nodeID;   // Matches the 'id' in FoundationTree (e.g., "y_1", "s_1")
-    public string nodeName; // Matches the 'case' in the switch statement
+    public string nodeName; // Matches the 'case' in the switch statement (e.g., "DataYield1")
     public double cost;
     public bool isUnlocked = false;
 
@@ -20,8 +20,12 @@ public class FoundationNode : MonoBehaviour
 
     void Start()
     {
-        // Find the tree manager in the parent object
+        // Find the tree manager in the parent object first
         tree = GetComponentInParent<FoundationTree>();
+        
+        // Safety Fallback: If layout groups separated it, search the whole scene
+        if (tree == null) 
+            tree = FindFirstObjectByType<FoundationTree>();
 
         if (nodeButton != null)
             nodeButton.onClick.AddListener(AttemptUnlock);
@@ -31,8 +35,19 @@ public class FoundationNode : MonoBehaviour
     {
         if (engine == null || nodeButton == null || tree == null) return;
 
+        // Sync local state with master tree logic data to handle resets or dynamic loads safely
+        bool purchasedInTree = tree.IsNodePurchased(nodeID);
+        if (purchasedInTree)
+        {
+            isUnlocked = true;
+        }
+
         // Check if prerequisites from the Tree logic are met
         bool prereqsMet = tree.ArePrerequisitesMet(nodeID);
+
+        // FETCH GIVEN NAME: Dynamically look up the display title from the backend TechNode list
+        TechNode backendNode = tree.nodes.Find(n => n.id == nodeID);
+        string givenName = backendNode != null ? backendNode.title : nodeName;
 
         if (!isUnlocked)
         {
@@ -42,22 +57,25 @@ public class FoundationNode : MonoBehaviour
 
             if (statusText != null)
             {
-                if (!prereqsMet) statusText.text = "LOCKED";
-                else statusText.text = "Cost: " + cost.ToString("N0") + " PP";
+                if (!prereqsMet) 
+                    statusText.text = $"{givenName}\n<color=red>LOCKED</color>";
+                else 
+                    statusText.text = $"{givenName}\nCost: {cost.ToString("N0")} PP";
             }
         }
         else
         {
             nodeButton.interactable = false;
-            if (statusText != null) statusText.text = "ACTIVE";
+            if (statusText != null) 
+                statusText.text = $"{givenName}\n<color=lime>ACTIVE</color>";
         }
     }
 
     public void AttemptUnlock()
     {
-        if (isUnlocked || tree == null) return;
+        if (isUnlocked || tree == null || engine == null) return;
 
-        // Double check prerequisites and cost
+        // Double check prerequisites and cost using the unique shorthand ID string
         if (tree.ArePrerequisitesMet(nodeID) && engine.totalPowerPoints >= cost)
         {
             engine.totalPowerPoints -= cost;
@@ -66,15 +84,25 @@ public class FoundationNode : MonoBehaviour
             // 1. Apply the mechanical bonus
             ApplyNodeBonus();
             
-            // 2. Tell the tree this ID is now purchased so it can unlock the next nodes
-            tree.MarkAsPurchased(nodeName); 
+            // 2. Pass the nodeID ("y_1") instead of nodeName so master data marks it accurately
+            tree.MarkAsPurchased(nodeID); 
             
-            Debug.Log(nodeName + " (ID: " + nodeID + ") Unlocked!");
+            // Look up the name one last time for a clean confirmation console log
+            TechNode backendNode = tree.nodes.Find(n => n.id == nodeID);
+            string givenName = backendNode != null ? backendNode.title : nodeName;
+
+            Debug.Log($"<color=lime>Success:</color> {givenName} (ID: {nodeID}) Unlocked! Spent {cost:N0} PP.");
+        }
+        else
+        {
+            Debug.LogWarning($"<color=orange>Purchase Blocked:</color> Insufficient points or locked prerequisites for {nodeID}.");
         }
     }
 
     private void ApplyNodeBonus()
     {
+        if (engine == null) return;
+
         // Use the exact switch logic you provided
         switch (nodeName)
         {

@@ -69,26 +69,47 @@ public class UpgradeManager : MonoBehaviour
 
     public void UpgradeTapeValue()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         double cost = EconomyDefinitions.CalculateCost(engine.tapeLevel, 10, 1.15);
         if (engine.currentData >= cost)
         {
             engine.currentData -= cost;
             engine.tapeLevel++;
+
+            engine.dataMult *= 1.25; // +25% Data yield
+            Debug.Log($"Tape Data Upgraded! New Multiplier: {engine.dataMult}x");
         }
     }
 
     public void UpgradeSpeed()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         double cost = EconomyDefinitions.CalculateCost(engine.speedLevel, 50, 1.8);
         if (engine.currentData >= cost)
         {
             engine.currentData -= cost;
             engine.speedLevel++;
+
+            engine.speedMult *= 1.15f; // +15% Speed
+            Debug.Log($"Processing Speed Upgraded! New Speed: {engine.speedMult}x");
         }
     }
 
     public void UpgradeSignalSensitivity()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         double cost = EconomyDefinitions.CalculateCost(engine.sensitivityLevel, 100, 2.0);
         if (engine.currentData >= cost)
         {
@@ -102,24 +123,44 @@ public class UpgradeManager : MonoBehaviour
 
     public void UpgradeProcessingSpeed()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         if (engine.UpgradeProcessingLevel()) 
             Debug.Log("Processing Speed Upgraded.");
     }
 
     public void UpgradeClarity()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         if (engine.UpgradeClarityLevel()) 
             Debug.Log("Signal Clarity Upgraded.");
     }
 
     public void UpgradeCompression()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         if (engine.UpgradeCompressionLevel()) 
             Debug.Log("Compression Upgraded.");
     }
 
     public void UpgradeDecayResistance()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         if (engine.UpgradeDecayResistanceLevel()) 
             Debug.Log("Decay Resistance Upgraded.");
     }
@@ -128,12 +169,22 @@ public class UpgradeManager : MonoBehaviour
 
     public void UpgradeMinePower()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         if (engine.miningController != null && engine.miningController.UpgradeMinePowerLevel())
             Debug.Log("Mine Power Upgraded.");
     }
 
     public void UpgradeMineSpeed()
     {
+        if (engine == null)
+        {
+            Debug.LogError("UpgradeManager: SignalEngine not initialized!");
+            return;
+        }
         if (engine.miningController != null && engine.miningController.UpgradeMineSpeedLevel())
             Debug.Log("Mine Speed Upgraded.");
     }

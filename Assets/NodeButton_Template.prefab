@@ -121,7 +121,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4210654646777911122}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8449217323755842396, guid: a487fde11a9214e40971f4a532d0af47, type: 3}
+        m_TargetAssemblyTypeName: FoundationNode, Assembly-CSharp
+        m_MethodName: AttemptUnlock
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &449784483412787720
 MonoBehaviour:
   m_ObjectHideFlags: 0

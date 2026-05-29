@@ -35,21 +35,32 @@ public class SignalEngine : MonoBehaviour
     public float pipelineSpeedMultiplier = 1.0f;
     public float signalDecayResistance = 0f;
     public float precisionMultiplier = 1.0f;
+    
+    /// <summary>Data yield multiplier modified by Foundation Tree (DataYield nodes)</summary>
+    public double dataMult = 1.0;
+    /// <summary>Processing speed multiplier modified by Foundation Tree (TapeSpeed nodes)</summary>
+    public float speedMult = 1.0f;
 
     [Header("Tech Tree Modifiers")]
-    public double dataMult = 1.0;
-    public float speedMult = 1.0f;
+    /// <summary>Travel time reduction multiplier from Discipline Tree (Automated Routing)</summary>
     public float travelTimeReduction = 0f;
+    /// <summary>Amplifier output boost from Discipline Tree (Stable Amps)</summary>
     public float amplifierBoost = 1.0f;
+    /// <summary>Mineral yield multiplier from Discipline Tree (Heavy Drills)</summary>
     public float mineralYieldMult = 1.0f;
+    /// <summary>Signal range multiplier from Foundation Tree (SignalRange node)</summary>
     public float signalRangeMult = 1.0f;
     float actualMaxHeat = 0f;
     public bool stableAmpsEnabled = false;
     public bool canRunAtFullHeat = false;
     public bool heatCorruptionEnabled = true;
+    /// <summary>Pure mineral drops unlocked (Deep Vein Mining node)</summary>
     public bool pureMineralDropsUnlocked = false;
+    /// <summary>Industrial overdrive system unlocked (Industrial Overdrive node)</summary>
     public bool industrialOverdriveUnlocked = false;
+    /// <summary>Industrial overdrive currently active</summary>
     public bool industrialOverdriveActive = false;
+    /// <summary>Flux cost to activate industrial overdrive</summary>
     public float industrialOverdriveFluxCost = 10f;
     public float flux = 0f;
     public float heatToFluxRate = 0f;
@@ -57,31 +68,53 @@ public class SignalEngine : MonoBehaviour
 
     public float baseNoiseFloor = 1.0f;
     public float highSNRChanceBonus = 0f;
+    /// <summary>Frequency match multiplier (Harmonic Tuning node)</summary>
     public float frequencyMatchMultiplier = 1.0f;
+    /// <summary>Prevents static spikes (Signal Isolation node)</summary>
     public bool preventsStaticSpikes = false;
+    /// <summary>Auto remove noise loops (Pattern Filtration node)</summary>
     public bool autoRemoveNoiseLoops = false;
+    /// <summary>Buffer decay reduction (Atmospheric Buffering node)</summary>
     public float bufferDecayReduction = 0f;
+    /// <summary>Sub-zero data bonus per heat reduction</summary>
     public float subZeroDataBonusPerHeatReduction = 0f;
     public float snrFilterBoost = 1.0f;
 
     public double infoValueMult = 1.0;
+    /// <summary>Blueprint fragment drop rate (Fragment Analysis node)</summary>
     public float blueprintFragmentDropRate = 0f;
+    /// <summary>Math signal payout multiplier (Prime Sequence Detection node)</summary>
     public float mathSignalMultiplier = 1.0f;
+    /// <summary>Stack value bonuses (Heuristic Learning node)</summary>
     public bool stackingValueBonuses = false;
+    /// <summary>Compression efficiency (Dictionary Encoding node)</summary>
     public float compressionEfficiency = 1.0f;
+    /// <summary>Pipeline slot cost reduction (Logic-Gate Optimization node)</summary>
     public float pipelineSlotCostReduction = 0f;
+    /// <summary>Non-linear multiplier unlocked (Fractal Mapping node)</summary>
     public bool nonLinearMultiplierUnlocked = false;
+    /// <summary>Compression cap removed (Lossless Mastery node)</summary>
     public bool compressionCapRemoved = false;
+    /// <summary>Squared output unlocked (Zero-Floor Protocol node)</summary>
     public bool unlocksSquaredOutput = false;
+    /// <summary>Infinite value unlocked (Singularity Compression node)</summary>
     public bool infiniteValueUnlocked = false;
+    /// <summary>Void credit siphon rate (Void Credit Siphoning node)</summary>
     public float vcSiphonRate = 0f;
 
+    /// <summary>Rare source discovery speed (artifact tech nodes)</summary>
     public float rareSourceDiscoverySpeed = 0f;
+    /// <summary>Ancient schematics value multiplier (Xeno-Archaeology node)</summary>
     public float ancientSchematicsValue = 0f;
+    /// <summary>Fragment synthesis enabled (Ancient Artifact node)</summary>
     public bool fragmentSynthesisEnabled = false;
+    /// <summary>Tier 4 signals unlocked (Cosmic Substrate node)</summary>
     public bool tier4SignalUnlocked = false;
+    /// <summary>Fragment cost reduction (Blueprint Stabilization node)</summary>
     public float fragmentCostReduction = 0f;
+    /// <summary>Chrono-tuning enabled (Chrono-Tuning node)</summary>
     public bool chronoTuningEnabled = false;
+    /// <summary>Planetary data boost (Interstellar Networking node)</summary>
     public float planetaryDataBoost = 0f;
 
     [Header("Decay Logic")]
@@ -91,23 +124,37 @@ public class SignalEngine : MonoBehaviour
 
     [Header("Signal Matching")]
     public SignalMatchingUI signalMatchingUI;
+    /// <summary>Auto signal matching unlocked (SignalAutomation/SignalMatchingAutomation nodes)</summary>
     public bool signalMatchingAutomationUnlocked = false;
 
     [Header("Tree & UI Support")]
+    /// <summary>Apply speed multiplier as bonus to data yield (DataYield5 node)</summary>
     public bool useSpeedAsDataBonus = false;
+    /// <summary>Multiplier applied to tape reset delay (TapeSpeed3 node)</summary>
     public float tapeResetDelay = 0f;
+    /// <summary>Threshold below which tapes complete instantly (TapeSpeed5 node)</summary>
     public float instantThreshold = 0f;
+    /// <summary>Base chance for rare signal discovery (RareChance1-3 nodes)</summary>
     public float rareChance = 0.05f;
+    /// <summary>Payout multiplier for rare signals (RareMultiplier node)</summary>
     public float rareMultiplier = 2.0f;
+    /// <summary>Unlock anomalous signal type (UnlockAnomalous node)</summary>
     public bool unlockAnomalous = false;
+    /// <summary>Auto-seeker prioritizes highest-value targets (AutoSeekerTargeting node)</summary>
     public bool autoSeekerTargetsBest = false;
+    /// <summary>Efficiency of offline processing (OfflineBonus/Max nodes)</summary>
     public float offlineEfficiency = 0.1f;
+    /// <summary>Bonus data per hour offline (OfflineData node)</summary>
     public float offlineDataBonusPerHour = 0f;
 
     [Header("Foundation Tree Support")]
+    /// <summary>Auto-seeker speed bonus per 10k data (AutoSeekerDataSpeed nodes)</summary>
     public float autoSeekerSpeedPerData = 0f;
+    /// <summary>Rare signals grant power points (RareSignalsGrantPP/VoidSiphon nodes)</summary>
     public bool rareSignalsGrantPP = false;
+    /// <summary>Unlock planetary system access (CanAccessPlanets/ApexGateway nodes)</summary>
     public bool canAccessPlanets = false;
+    /// <summary>Heat capacity multiplier for Foundation Tree upgrades</summary>
     public float heatCapacityMult = 1.0f;
 
     // Add these methods at the bottom
@@ -117,7 +164,9 @@ public class SignalEngine : MonoBehaviour
     [Header("Final Script Support")]
     public double powerPoints; // Not 'powerPoints' previously? Added for FoundationTree.
     public float totalDataLifetime = 60f;
+    /// <summary>Cost reduction per 'A' node in Foundation Tree (UpgradeCostReduction nodes)</summary>
     public float upgradeCostReductionPerANode = 0f;
+    /// <summary>Speed burst effect enabled (ChronosPulse/SpeedBurst/EnableSpeedBurst nodes)</summary>
     public bool enableSpeedBurst = false;
 
     // Add these methods at the bottom of SignalEngine
