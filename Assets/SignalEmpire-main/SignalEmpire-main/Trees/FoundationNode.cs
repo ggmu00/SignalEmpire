@@ -7,7 +7,7 @@ public class FoundationNode : MonoBehaviour
     private SignalEngine engine => SignalEngine.instance;
 
     [Header("Node Settings")]
-    public string nodeID;   // Matches the 'id' in FoundationTree (e.g., "y_1", "s_1")
+    public string nodeID;   // Matches the 'id' in FoundationTree (e.g., "y_1")
     public string nodeName; // Matches the 'case' in the switch statement (e.g., "DataYield1")
     public double cost;
     public bool isUnlocked = false;
@@ -16,94 +16,135 @@ public class FoundationNode : MonoBehaviour
     public Button nodeButton;
     public TextMeshProUGUI statusText; 
 
+    public TMP_Text globalDescriptionText; // Drag the NodeDescription TMP Text component here
+
     private FoundationTree tree;
+    private static FoundationNode currentlySelectedNode = null; 
+
+    void OnValidate()
+    {
+        if (nodeButton == null) nodeButton = GetComponent<Button>();
+        if (statusText == null) statusText = GetComponentInChildren<TextMeshProUGUI>();
+    }
 
     void Start()
     {
-        // Find the tree manager in the parent object first
         tree = GetComponentInParent<FoundationTree>();
-        
-        // Safety Fallback: If layout groups separated it, search the whole scene
         if (tree == null) 
             tree = FindFirstObjectByType<FoundationTree>();
 
         if (nodeButton != null)
-            nodeButton.onClick.AddListener(AttemptUnlock);
+        {
+            nodeButton.onClick.RemoveAllListeners();
+            nodeButton.onClick.AddListener(HandleNodeClick);
+        }
+
+        UpdateNodeVisuals();
     }
 
     void Update()
     {
-        if (engine == null || nodeButton == null || tree == null) return;
+        if (engine == null || tree == null || nodeButton == null) return;
 
-        // Sync local state with master tree logic data to handle resets or dynamic loads safely
-        bool purchasedInTree = tree.IsNodePurchased(nodeID);
-        if (purchasedInTree)
+        if (tree.IsNodePurchased(nodeID))
         {
             isUnlocked = true;
         }
 
-        // Check if prerequisites from the Tree logic are met
-        bool prereqsMet = tree.ArePrerequisitesMet(nodeID);
+        UpdateNodeVisuals();
+    }
 
-        // FETCH GIVEN NAME: Dynamically look up the display title from the backend TechNode list
-        TechNode backendNode = tree.nodes.Find(n => n.id == nodeID);
-        string givenName = backendNode != null ? backendNode.title : nodeName;
+    public void HandleNodeClick()
+    {
+        if (tree == null) return;
 
-        if (!isUnlocked)
+        if (isUnlocked)
         {
-            // Button is interactable only if affordable AND prerequisites are met
-            bool canAfford = engine.totalPowerPoints >= cost;
-            nodeButton.interactable = canAfford && prereqsMet;
-
-            if (statusText != null)
-            {
-                if (!prereqsMet) 
-                    statusText.text = $"{givenName}\n<color=red>LOCKED</color>";
-                else 
-                    statusText.text = $"{givenName}\nCost: {cost.ToString("N0")} PP";
-            }
+            DisplayDescription();
+            return;
         }
-        else
+
+        // If this is a new selection, switch the highlight and update the description.
+        bool isNewSelection = currentlySelectedNode != this;
+        if (currentlySelectedNode != null && currentlySelectedNode != this)
         {
-            nodeButton.interactable = false;
-            if (statusText != null) 
-                statusText.text = $"{givenName}\n<color=green>ACTIVE</color>";
+            currentlySelectedNode.UpdateNodeVisuals();
+        }
+
+        currentlySelectedNode = this;
+        DisplayDescription();
+        UpdateNodeVisuals();
+
+        if (!isNewSelection)
+        {
+            // Second click on the same node attempts purchase.
+            if (!tree.ArePrerequisitesMet(nodeID))
+            {
+                if (globalDescriptionText != null)
+                    globalDescriptionText.text = $"<b>{statusText.text.Split('\n')[0]}</b>\nPrerequisites not met.";
+                return;
+            }
+
+            if (engine.totalPowerPoints < cost)
+            {
+                if (globalDescriptionText != null)
+                    globalDescriptionText.text = $"<b>{statusText.text.Split('\n')[0]}</b>\nNot enough PP to purchase.";
+                return;
+            }
+
+            engine.totalPowerPoints -= cost;
+            isUnlocked = true;
+            ApplyNodeBonus();
+            tree.MarkAsPurchased(nodeID);
+            currentlySelectedNode = null;
+            if (globalDescriptionText != null) globalDescriptionText.text = "";
+            UpdateNodeVisuals();
         }
     }
 
-    public void AttemptUnlock()
+    public void UpdateNodeVisuals()
     {
-        if (isUnlocked || tree == null || engine == null) return;
+        if (statusText == null || tree == null) return;
 
-        // Double check prerequisites and cost using the unique shorthand ID string
-        if (tree.ArePrerequisitesMet(nodeID) && engine.totalPowerPoints >= cost)
-        {
-            engine.totalPowerPoints -= cost;
-            isUnlocked = true;
-            
-            // 1. Apply the mechanical bonus
-            ApplyNodeBonus();
-            
-            // 2. Pass the nodeID ("y_1") instead of nodeName so master data marks it accurately
-            tree.MarkAsPurchased(nodeID); 
-            
-            // Look up the name one last time for a clean confirmation console log
-            TechNode backendNode = tree.nodes.Find(n => n.id == nodeID);
-            string givenName = backendNode != null ? backendNode.title : nodeName;
+        bool prereqsMet = tree.ArePrerequisitesMet(nodeID);
+        TechNode backendNode = tree.nodes.Find(n => n.id == this.nodeID);
+        string givenName = backendNode != null ? backendNode.title : nodeName;
 
-            Debug.Log($"<color=lime>Success:</color> {givenName} (ID: {nodeID}) Unlocked! Spent {cost:N0} PP.");
-        }
-        else
+        if (isUnlocked)
         {
-            Debug.LogWarning($"<color=orange>Purchase Blocked:</color> Insufficient points or locked prerequisites for {nodeID}.");
+            if (nodeButton != null) nodeButton.interactable = false;
+            statusText.text = $"{givenName}\nACTIVE";
+            statusText.color = new Color(0f, 0.5f, 0f);
+            return;
         }
+
+        if (currentlySelectedNode == this)
+        {
+            statusText.text = $"{givenName}\nSELECTED";
+            statusText.color = Color.cyan;
+            if (nodeButton != null) nodeButton.interactable = true;
+            return;
+        }
+
+        statusText.color = prereqsMet ? Color.black : new Color(0.65f, 0.2f, 0.2f);
+        statusText.text = prereqsMet ? $"{givenName}\nCost: {cost.ToString("N0")} PP" : $"{givenName}\nLOCKED";
+        if (nodeButton != null) nodeButton.interactable = true;
+    }
+
+    private void DisplayDescription()
+    {
+        if (globalDescriptionText == null) return;
+
+        TechNode backendNode = tree.nodes.Find(n => n.id == this.nodeID);
+        string givenName = backendNode != null ? backendNode.title : nodeName;
+        string description = backendNode != null ? backendNode.description : "No log data available.";
+
+        globalDescriptionText.text = $"<b>{givenName}</b>\n{description}\n<color=yellow>[Click again to buy]</color>";
     }
 
     private void ApplyNodeBonus()
     {
         if (engine == null) return;
-
-        // Use the exact switch logic you provided
         switch (nodeName)
         {
             case "AutoSeeker": engine.autoSeekerSpeedPerData = 0.5f; break;

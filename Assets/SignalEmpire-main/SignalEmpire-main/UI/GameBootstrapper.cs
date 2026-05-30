@@ -4,6 +4,7 @@ public class GameBootstrapper : MonoBehaviour
 {
     void Start()
     {
+        
         // Locates our manager script in the scene and fires it up
         FoundationTreeSetup treeSetup = FindFirstObjectByType<FoundationTreeSetup>();
         
