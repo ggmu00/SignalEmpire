@@ -64,8 +64,8 @@ public class FoundationNode : MonoBehaviour
             return;
         }
 
-        // If this is a new selection, switch the highlight and update the description.
         bool isNewSelection = currentlySelectedNode != this;
+
         if (currentlySelectedNode != null && currentlySelectedNode != this)
         {
             currentlySelectedNode.UpdateNodeVisuals();
@@ -75,31 +75,39 @@ public class FoundationNode : MonoBehaviour
         DisplayDescription();
         UpdateNodeVisuals();
 
-        if (!isNewSelection)
+        if (isNewSelection)
         {
-            // Second click on the same node attempts purchase.
-            if (!tree.ArePrerequisitesMet(nodeID))
-            {
-                if (globalDescriptionText != null)
-                    globalDescriptionText.text = $"<b>{statusText.text.Split('\n')[0]}</b>\nPrerequisites not met.";
-                return;
-            }
-
-            if (engine.totalPowerPoints < cost)
-            {
-                if (globalDescriptionText != null)
-                    globalDescriptionText.text = $"<b>{statusText.text.Split('\n')[0]}</b>\nNot enough PP to purchase.";
-                return;
-            }
-
-            engine.totalPowerPoints -= cost;
-            isUnlocked = true;
-            ApplyNodeBonus();
-            tree.MarkAsPurchased(nodeID);
-            currentlySelectedNode = null;
-            if (globalDescriptionText != null) globalDescriptionText.text = "";
-            UpdateNodeVisuals();
+            // First click selects the node.
+            return;
         }
+
+        // Second click on the same node attempts purchase.
+        if (!tree.ArePrerequisitesMet(nodeID))
+        {
+            if (globalDescriptionText != null)
+                globalDescriptionText.text = $"<b>{statusText.text.Split('\n')[0]}</b>\nPrerequisites not met.";
+            return;
+        }
+
+        if (engine == null)
+        {
+            return;
+        }
+
+        if (engine.totalPowerPoints < cost)
+        {
+            if (globalDescriptionText != null)
+                globalDescriptionText.text = $"<b>{statusText.text.Split('\n')[0]}</b>\nNot enough PP to purchase.";
+            return;
+        }
+
+        engine.totalPowerPoints -= cost;
+        isUnlocked = true;
+        ApplyNodeBonus();
+        tree.MarkAsPurchased(nodeID);
+        currentlySelectedNode = null;
+        if (globalDescriptionText != null) globalDescriptionText.text = "";
+        UpdateNodeVisuals();
     }
 
     public void UpdateNodeVisuals()
