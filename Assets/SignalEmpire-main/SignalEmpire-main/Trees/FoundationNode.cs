@@ -150,7 +150,7 @@ public class FoundationNode : MonoBehaviour
         globalDescriptionText.text = $"<b>{givenName}</b>\n{description}\n<color=yellow>[Click again to buy]</color>";
     }
 
-    private void ApplyNodeBonus()
+    public void ApplyNodeBonus()
     {
         if (engine == null) return;
         switch (nodeName)

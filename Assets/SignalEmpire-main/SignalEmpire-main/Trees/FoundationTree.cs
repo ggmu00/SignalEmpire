@@ -5,7 +5,10 @@ using System.Linq;
 public class FoundationTree : MonoBehaviour
 {
     private SignalEngine engine => SignalEngine.instance;
-    
+    private FoundationTreeInitializer FTI => GetComponent<FoundationTreeInitializer>();
+    private FoundationTreeUI FTU => GetComponent<FoundationTreeUI>();
+    private FoundationNode FN => GetComponent<FoundationNode>();
+
     [Header("Tree Data")]
     public List<TechNode> nodes = new List<TechNode>();    
     [Header("Managers")]
@@ -13,7 +16,7 @@ public class FoundationTree : MonoBehaviour
 
     void Awake()
     {
-        InitializeFullTree();
+        /*FTI.*/InitializeFullTree();
     }
 
     private void InitializeFullTree()
@@ -53,7 +56,7 @@ public class FoundationTree : MonoBehaviour
         AddNode("syn_2", "AutoSeekerDataSpeed", "Economic AI", "Speed scales with Data.", 1500, "y_3,a_3");
         AddNode("syn_3", "RareSignalsGrantPP", "Void Siphon", "Rare signals grant PP.", 5000, "l_4,a_4");
 
-        // --- THE APEX GATEWAY ---
+        //
         AddNode("apex", "CanAccessPlanets", "Apex Gateway", "Unlock Planetary Access.", 10000, "syn_3");
         AddNode("auto", "SignalMatchingAutomation", "Signal Automation", "Auto Signal Matching.", 15000, "apex");
     }
@@ -82,7 +85,7 @@ public class FoundationTree : MonoBehaviour
         if (node != null)
         {
             node.isPurchased = true;
-            ApplyNodeEffect(node.id); 
+            FN.ApplyNodeBonus();
         }
     }
 
@@ -107,7 +110,7 @@ public class FoundationTree : MonoBehaviour
     }
 
     // FIX: Added the missing ApplyNodeEffect method
-    public void ApplyNodeEffect(string id)
+    /*public void ApplyNodeEffect(string id)
     {
         SignalEngine engine = SignalEngine.instance;
         if (engine == null) return;
@@ -120,5 +123,5 @@ public class FoundationTree : MonoBehaviour
             // Add more cases here matching your y_1, s_1, etc.
         }
         Debug.Log($"Effect applied for {id}");
-    }
+    }*/
 }
