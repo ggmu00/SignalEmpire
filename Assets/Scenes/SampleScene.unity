@@ -453,7 +453,7 @@ MonoBehaviour:
   dataDisplay: {fileID: 778140351}
   ppDisplay: {fileID: 1714930408}
   progressSlider: {fileID: 1755427345}
-  heatFillImage: {fileID: 117752436}
+  heatFillImage: {fileID: 1844467536}
 --- !u!1001 &158600230
 PrefabInstance:
   m_ObjectHideFlags: 0
